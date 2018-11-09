@@ -37,6 +37,9 @@
     "lint": "semistandard src/**/*.js test/**/*.js --fix",
     "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --opts mocha.opts",
     "coverage": "cross-env NODE_CONFIG_DIR=./test/config/ istanbul cover node_modules/mocha/bin/_mocha -- --opts mocha.opts",
+    "clean:test": "rimraf data/db/* && rimraf coverage",
+    "clean": "yarn --cmd 'clean:test' && rimraf lib && rimraf node_modules",
+    "test:start-db": "mongod --dbpath=data/db",
     "test": "npm run compile && npm run lint && npm run coverage",
     "start": "npm run compile && node example/app"
   },
@@ -50,13 +53,14 @@
     "lib": "lib"
   },
   "dependencies": {
+    "@feathersjs/commons": "^3.0.1",
+    "@feathersjs/errors": "^3.3.4",
+    "@feathersjs/feathers": "^3.2.3",
     "debug": "^3.1.0",
-    "feathers": "^2.1.4",
-    "feathers-commons": "^0.8.7",
-    "feathers-errors": "^2.8.1",
-    "feathers-query-filters": "^2.1.2"
+    "sift": "^7.0.1"
   },
   "devDependencies": {
+    "@feathersjs/configuration": "^2.0.4",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -65,10 +69,14 @@
     "chai-lint": "^0.1.1",
     "containerized": "^1.0.2",
     "cross-env": "^5.0.1",
-    "feathers-configuration": "^0.4.1",
+    "feathers-service-tests": "^0.10.2",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.4.2",
-    "mongodb": "^2.2.29",
+    "mongodb": "^3.1.9",
+    "mongodb-core": "^3.1.8",
+    "mongoose": "^5.3.10",
+    "nyc": "^13.1.0",
+    "rimraf": "^2.6.2",
     "semistandard": "^11.0.0",
     "shx": "^0.2.2"
   }

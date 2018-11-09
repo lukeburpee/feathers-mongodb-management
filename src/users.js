@@ -1,4 +1,4 @@
-import Service from './service';
+import { Service } from './service';
 
 // Create the service.
 class UserService extends Service {
@@ -6,11 +6,12 @@ class UserService extends Service {
     super(options);
 
     if (!options || !options.db) {
-      throw new Error('MongoDB DB option has to be provided');
+      throw new Error('MongoDB database must be provided');
     }
+    this.id = options.id || 'user';
+    this.events = options.events || [];
+    this.paginate = options.paginate || {};
     this.db = options.db;
-    // Only available for Mongo > 2.4, if set to false will fallback to Mongo system users collection
-    this.hasUserInfosCommand = options.hasUserInfosCommand || true;
   }
 
   // Helper function to process user infos object
@@ -23,29 +24,24 @@ class UserService extends Service {
 
   createImplementation (id, options) {
     if (!options.password) {
-      throw new Error('Password option has to be provided');
+      throw new Error('Password option must be provided');
     }
     return this.db.addUser(id, options.password, options);
   }
 
   getImplementation (id) {
-    if (this.hasUserInfosCommand) {
-      return this.db.command({ usersInfo: id })
-      .then(data => data.users[0]);
-    } else {
-      return this.db.collection('system.users').find({ user: id }).toArray()
-      .then(users => users[0]);
-    }
+    return this.db.command({
+      usersInfo: 1,
+      filter: {
+        _id: id
+      }
+    })
+    .then(data => data.users[0]);
   }
 
   listImplementation () {
-    if (this.hasUserInfosCommand) {
-      return this.db.command({ usersInfo: 1 })
+    return this.db.command({ usersInfo: 1 })
       .then(data => data.users);
-    } else {
-      return this.db.collection('system.users').find().toArray()
-      .then(users => users);
-    }
   }
 
   removeImplementation (item) {

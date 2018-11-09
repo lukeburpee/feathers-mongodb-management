@@ -1,13 +1,16 @@
-import Service from './service';
+import { Service } from './service';
 
 // Create the service.
 class CollectionService extends Service {
   constructor (options) {
     super(options);
 
-    if (!options || !options.db) {
-      throw new Error('MongoDB DB options have to be provided');
+    if (!options.db) {
+      throw new Error('Collection database must be provided');
     }
+    this.id = options.id || 'name';
+    this.events = options.events || [];
+    this.paginate = options.paginate || {};
     this.db = options.db;
   }
 
@@ -23,9 +26,7 @@ class CollectionService extends Service {
   }
 
   createImplementation (id, options) {
-    return this.db.createCollection(id, options)
-    .then(collection => collection.stats())
-    .then(infos => this.processObjectInfos(infos));
+    return this.db.createCollection(id, options);
   }
 
   getImplementation (id) {

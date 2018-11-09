@@ -1,19 +1,28 @@
-import errors from 'feathers-errors';
-import filter from 'feathers-query-filters';
-import { isObject, each, sorter, matcher, select, _ } from 'feathers-commons';
-
+import errors from '@feathersjs/errors';
+import { filterQuery as filter, sorter, select, _ } from '@feathersjs/commons';
+import sift from 'sift';
 // Create the base service.
 class Service {
   constructor (options) {
+    if (!options) {
+      throw new Error('MongoDB management services require options');
+    }
+    this.id = options.id || '_id';
+    this.events = options.events || [];
     this.paginate = options.paginate || {};
-    this._matcher = options.matcher || matcher;
+    this._matcher = options.matcher;
     this._sorter = options.sorter || sorter;
+  }
+
+  get (id, params) {
+    return this.getImplementation(id);
   }
 
   // Find without hooks and mixins that can be used internally and always returns
   // a pagination object
-  _find (params, getFilter = filter) {
-    const { query, filters } = getFilter(params.query || {});
+  _find (params) {
+    const { query, filters } = filter(params.query ? params.query : {});
+
     // first get all items
     return this.listImplementation()
     .then(items => {
@@ -28,26 +37,32 @@ class Service {
       return Promise.all(infosPromises);
     })
     .then(infos => {
-      each(infos, this.processObjectInfos);
+      _.each(infos, this.processObjectInfos);
+      let values = _.values(infos);
 
-      let values = _.values(infos).filter(this._matcher(query));
-
+      if (this._matcher) {
+        values = values.filter(this._matcher(query));
+      } else {
+        values = sift(query, values);
+      }
       const total = values.length;
 
-      if (filters.$sort) {
-        values.sort(this._sorter(filters.$sort));
-      }
+      if (filters) {
+        if (filters.$sort) {
+          values.sort(this._sorter(filters.$sort));
+        }
 
-      if (filters.$skip) {
-        values = values.slice(filters.$skip);
-      }
+        if (filters.$skip) {
+          values = values.slice(filters.$skip);
+        }
 
-      if (typeof filters.$limit !== 'undefined') {
-        values = values.slice(0, filters.$limit);
-      }
+        if (typeof filters.$limit !== 'undefined') {
+          values = values.slice(0, filters.$limit);
+        }
 
-      if (filters.$select) {
-        values = values.map(value => _.pick(value, ...filters.$select));
+        if (filters.$select) {
+          values = values.map(value => _.pick(value, ...filters.$select));
+        }
       }
 
       return {
@@ -95,16 +110,16 @@ class Service {
   // Remove without hooks and mixins that can be used internally
   _remove (idOrInfos, params) {
     let itemPromise;
-    if (isObject(idOrInfos)) {
-      itemPromise = this.getImplementation(idOrInfos.name);
+    if (_.isObject(idOrInfos)) {
+      itemPromise = this.getImplementation(idOrInfos._id);
     } else {
       itemPromise = this.getImplementation(idOrInfos);
     }
     return itemPromise.then(item => {
       if (item) {
         return this.removeImplementation(item)
-        .then(_ => {
-          if (isObject(idOrInfos)) {
+        .then(() => {
+          if (_.isObject(idOrInfos)) {
             return idOrInfos;
           } else {
             return { name: idOrInfos };
@@ -112,9 +127,9 @@ class Service {
         });
       }
 
-      if (isObject(idOrInfos)) {
+      if (_.isObject(idOrInfos)) {
         return Promise.reject(
-          new errors.NotFound(`No record found for id '${idOrInfos.name}'`)
+          new errors.NotFound(`No record found for id '${idOrInfos._id}'`)
         );
       } else {
         return Promise.reject(
@@ -149,4 +164,10 @@ class Service {
   */
 }
 
-export default Service;
+export default function init (options) {
+  return new Service(options);
+}
+
+export {
+  Service
+};
