@@ -29,8 +29,13 @@ class UserService extends Service {
     return this.db.addUser(id, options.password, options);
   }
 
-  getImplementation (id) {
-    const cmd = { usersInfo: { user: id } }
+  getImplementation (id, params) {
+    let cmd;
+    if (params.db) {
+      cmd = { usersInfo: { user: id, db: params.db }}
+    } else {
+      cmd = { usersInfo: id }
+    }
     return this.db.command(cmd)
     .then(data => data.users[0]);
   }

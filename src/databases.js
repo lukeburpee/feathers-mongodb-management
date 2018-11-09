@@ -40,7 +40,7 @@ class DatabaseService extends Service {
     .then(infos => this.processObjectInfos(infos));
   }
 
-  getImplementation (id) {
+  getImplementation (id, params) {
     return Promise.resolve(this.client.db(id));
   }
 

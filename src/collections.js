@@ -29,7 +29,7 @@ class CollectionService extends Service {
     return this.db.createCollection(id, options);
   }
 
-  getImplementation (id) {
+  getImplementation (id, params) {
     return Promise.resolve(this.db.collection(id));
   }
 

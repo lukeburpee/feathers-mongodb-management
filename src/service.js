@@ -15,7 +15,7 @@ class Service {
   }
 
   get (id, params) {
-    return this.getImplementation(id);
+    return this.getImplementation(id, params);
   }
 
   // Find without hooks and mixins that can be used internally and always returns
