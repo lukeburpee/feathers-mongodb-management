@@ -8,7 +8,7 @@ module.exports = {
     max: 50
   },
   db: {
-    url: containerized ? 'mongodb://mongodb:27017' : 'mongodb://localhost:27017',
+    url: containerized ? 'mongodb://mongodb:27017' : 'mongodb://127.0.0.1:27017',
     dbName: 'feathers-test',
     defaultOptions: {
       useNewUrlParser: true,

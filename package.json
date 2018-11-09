@@ -35,12 +35,12 @@
     "compile": "shx rm -rf lib/ && babel -d lib/ src/",
     "watch": "babel --watch -d lib/ src/",
     "lint": "semistandard src/**/*.js test/**/*.js --fix",
-    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ mocha --opts mocha.opts",
-    "coverage": "cross-env NODE_CONFIG_DIR=./test/config/ istanbul cover node_modules/mocha/bin/_mocha -- --opts mocha.opts",
+    "mocha": "cross-env NODE_CONFIG_DIR=./test/config/ nyc mocha --opts mocha.opts",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "clean:test": "rimraf data/db/* && rimraf coverage",
     "clean": "yarn --cmd 'clean:test' && rimraf lib && rimraf node_modules",
     "test:start-db": "mongod --dbpath=data/db",
-    "test": "npm run compile && npm run lint && npm run coverage",
+    "test": "npm run compile && npm run lint && npm run mocha",
     "start": "npm run compile && node example/app"
   },
   "semistandard": {
@@ -68,6 +68,7 @@
     "chai": "^3.5.0",
     "chai-lint": "^0.1.1",
     "containerized": "^1.0.2",
+    "coveralls": "^3.0.2",
     "cross-env": "^5.0.1",
     "feathers-service-tests": "^0.10.2",
     "istanbul": "^1.1.0-alpha.1",
