@@ -40,7 +40,7 @@ describe('feathers-mongodb-management', () => {
       db = mongo.db(app.get('db').dbName);
       adminDb = db.admin();
 
-      testUserId = 'feathers-test.test-user'
+      testUserId = 'test-user'
 
       testUser = {
         name: 'test-user',

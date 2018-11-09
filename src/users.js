@@ -30,12 +30,8 @@ class UserService extends Service {
   }
 
   getImplementation (id) {
-    return this.db.command({
-      usersInfo: 1,
-      filter: {
-        _id: id
-      }
-    })
+    const cmd = { usersInfo: { user: id } }
+    return this.db.command(cmd)
     .then(data => data.users[0]);
   }
 
