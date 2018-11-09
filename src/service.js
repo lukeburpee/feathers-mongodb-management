@@ -7,7 +7,6 @@ class Service {
     if (!options) {
       throw new Error('MongoDB management services require options');
     }
-    this.id = options.id || '_id';
     this.events = options.events || [];
     this.paginate = options.paginate || {};
     this._matcher = options.matcher;
@@ -111,7 +110,7 @@ class Service {
   _remove (idOrInfos, params) {
     let itemPromise;
     if (_.isObject(idOrInfos)) {
-      itemPromise = this.getImplementation(idOrInfos._id);
+      itemPromise = this.getImplementation(idOrInfos[this.id]);
     } else {
       itemPromise = this.getImplementation(idOrInfos);
     }

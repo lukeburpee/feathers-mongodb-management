@@ -244,7 +244,7 @@ describe('feathers-mongodb-management', () => {
           debug(serviceUser);
           db.command({ usersInfo: 'test-user' })
           .then(response => {
-            expect(response.users[0]._id).to.equal(testUserId);
+            expect(response.users[0].user).to.equal(testUserId);
           });
         });
       });
@@ -301,8 +301,8 @@ describe('feathers-mongodb-management', () => {
         return app.service('users').remove(testUserId)
         .then(serviceUser => {
           debug(serviceUser);
-          db.command({ usersInfo: 'test-user' })
-          .then((err, user) => {
+          db.command({ usersInfo: testUserId })
+          .catch((err, user) => {
             expect(err).toExist();
           });
         });

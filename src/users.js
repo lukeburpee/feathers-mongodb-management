@@ -31,10 +31,10 @@ class UserService extends Service {
 
   getImplementation (id, params) {
     let cmd;
-    if (params.db) {
-      cmd = { usersInfo: { user: id, db: params.db }}
+    if (params && typeof params.db !== 'undefined') {
+      cmd = { usersInfo: { user: id, db: params.db } };
     } else {
-      cmd = { usersInfo: id }
+      cmd = { usersInfo: id };
     }
     return this.db.command(cmd)
     .then(data => data.users[0]);
